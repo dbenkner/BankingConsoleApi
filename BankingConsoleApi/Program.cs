@@ -1,9 +1,21 @@
-﻿using BankingConsoleApi.Controllers;
+﻿using BankingConsoleApi;
+using BankingConsoleApi.Controllers;
 
 bool programRunning = true;
 string userInput = string.Empty;
 CustomersController _cusCtrlr = new CustomersController();
-while (programRunning == true)
-{
-    var customer = _cusCtrlr.LoginCustomer();
-}
+Customer? customer = null;
+
+//while (programRunning == true)
+//{
+    while (customer == null)
+    {
+        customer = await _cusCtrlr.LoginCustomer();
+        if (customer == null)
+        {
+            Console.WriteLine("Login failed. Please try again.");
+        }
+    }
+
+Console.WriteLine("Login Success!");
+//}
