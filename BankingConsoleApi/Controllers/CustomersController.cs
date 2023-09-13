@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 namespace BankingConsoleApi.Controllers
 {
 
-    public class CustomersController 
+    public class CustomersController : GeneralController
     {
-        public async Task
+        public Customer LoginCustomer()
+        {
+            var CardCode = ReadAndWrite("Please enter your Card Code: ");
+            var PinCode = ReadAndWrite("Please enter you Pin Code: ");
+        }
+
+        
     }
 }
