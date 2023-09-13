@@ -13,11 +13,19 @@ namespace BankingConsoleApi.Controllers
         const string BaseURL = "http://localhost:5555";
         HttpClient _http = new HttpClient();
 
-        public Customer LoginCustomer()
+        public Customer? LoginCustomer()
         {
-            var CardCode = ReadAndWrite("Please enter your Card Code: ");
-            var PinCode = ReadAndWrite("Please enter you Pin Code: ");
-
+            var CardCodeStr = ReadAndWrite("Please enter your Card Code: ");
+            var PinCodeStr = ReadAndWrite("Please enter you Pin Code: ");
+            int CardCodeInt;
+            int PinCodeInt;
+            bool successCardCode = int.TryParse(CardCodeStr, out CardCodeInt);
+            bool successPinCode = int.TryParse(PinCodeStr, out PinCodeInt);
+            if (successCardCode == false || successPinCode == false)
+            {
+                Console.WriteLine("Please try again.");
+                return null;
+            }
         }
         async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
         {
