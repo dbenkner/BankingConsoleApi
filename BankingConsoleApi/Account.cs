@@ -17,6 +17,7 @@ namespace BankingConsoleApi
         public string Description { get; set; } = string.Empty;
 
         public decimal InterestRate { get; set; }
+        public decimal? Balance { get; set; } = 0.0m;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? ModifiedDate { get; set; }
         public DateTime? LastTransactionDate { get; set; }
