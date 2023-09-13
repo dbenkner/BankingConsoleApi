@@ -1,2 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿bool programRunning = true;
+string userInput = string.Empty;
+while (programRunning == true)
+{
+
+}
+
+
