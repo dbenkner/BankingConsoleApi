@@ -19,7 +19,7 @@ namespace BankingConsoleApi.Controllers
             WriteIndented = true
         };
 
-        public async Task<Customer> LoginCustomer()
+        public async Task<Customer?> LoginCustomer()
         {
             var CardCodeStr = ReadAndWrite("Please enter your Card Code: ");
             var PinCodeStr = ReadAndWrite("Please enter you Pin Code: ");
@@ -29,16 +29,10 @@ namespace BankingConsoleApi.Controllers
             bool successPinCode = int.TryParse(PinCodeStr, out PinCodeInt);
             if (successCardCode == false || successPinCode == false)
             {
-                Console.WriteLine("Please try again.");
                 return null;
             }
             var customer = await LogIn(_http, joptions, CardCodeInt, PinCodeInt);
-            if (customer == null)
-            {
-                Console.WriteLine("Log on failed");
-                return null;
-            }
-            
+
             return customer;
         }
         public async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
