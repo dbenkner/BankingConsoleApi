@@ -17,7 +17,32 @@ while (programRunning == true)
             Console.WriteLine("Login failed. Please try again.");
         }
     }
-    Console.WriteLine("Log in Sucuess!");
-    generalCtrlr.OptionsMenu();
+    Console.WriteLine("Log in Success!");
+
+    var option = generalCtrlr.OptionsMenu();
+    switch (option)
+    {
+        case "1":
+            break;
+        case "2":
+            break;
+        case "3":
+            break;
+        case "4":
+            break;
+        case "5":
+            break;
+        case "6":
+            break;
+        default:
+            Console.WriteLine("Please select a valid option.");
+            OptionsMenu();
+            break;
+    }
+
+
+
+
+
     programRunning = false;
 }
