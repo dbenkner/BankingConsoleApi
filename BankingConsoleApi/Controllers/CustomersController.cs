@@ -12,8 +12,14 @@ namespace BankingConsoleApi.Controllers
     {
         const string BaseURL = "http://localhost:5555";
         HttpClient _http = new HttpClient();
+        JsonSerializerOptions joptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
 
-        public Customer? LoginCustomer()
+        public async Task<Customer> LoginCustomer()
         {
             var CardCodeStr = ReadAndWrite("Please enter your Card Code: ");
             var PinCodeStr = ReadAndWrite("Please enter you Pin Code: ");
@@ -26,10 +32,22 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Please try again.");
                 return null;
             }
+            var customer = await LogIn(_http, joptions, CardCodeInt, PinCodeInt);
+            if (customer == null)
+            {
+                Console.WriteLine("Log on failed");
+                return null;
+            }
+            
+            return customer;
         }
-        async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
+        public async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
         {
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{BaseURL}/api/customers/{Cardcode}/{Pincode}");
+            HttpResponseMessage response = await _http.SendAsync(req);
+            var json = await response.Content.ReadAsStringAsync();
+            var customer = (Customer?)JsonSerializer.Deserialize(json, typeof(Customer), joptions);
+            return customer;
         }
     }
 }
