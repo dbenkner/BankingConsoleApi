@@ -5,9 +5,10 @@ bool programRunning = true;
 string userInput = string.Empty;
 CustomersController _cusCtrlr = new CustomersController();
 Customer? customer = null;
+GeneralController generalCtrlr = new GeneralController();
 
-//while (programRunning == true)
-//{
+while (programRunning == true)
+{
     while (customer == null)
     {
         customer = await _cusCtrlr.LoginCustomer();
@@ -16,6 +17,7 @@ Customer? customer = null;
             Console.WriteLine("Login failed. Please try again.");
         }
     }
-
-Console.WriteLine("Login Success!");
-//}
+    Console.WriteLine("Log in Sucuess!");
+    generalCtrlr.OptionsMenu();
+    programRunning = false;
+}

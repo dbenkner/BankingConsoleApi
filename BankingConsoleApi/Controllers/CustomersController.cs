@@ -32,10 +32,14 @@ namespace BankingConsoleApi.Controllers
                 return null;
             }
             var customer = await LogIn(_http, joptions, CardCodeInt, PinCodeInt);
+            if (customer.Id == 0)
+            {
+                return null;
+            }
 
             return customer;
         }
-        public async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
+        private async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
         {
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{BaseURL}/api/customers/{Cardcode}/{Pincode}");
             HttpResponseMessage response = await _http.SendAsync(req);
