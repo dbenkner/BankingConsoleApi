@@ -7,6 +7,7 @@ bool ProgramRunning = true;
 CustomersController _cusCtrlr = new CustomersController();
 Customer? customer = null;
 GeneralController generalCtrlr = new GeneralController();
+AccountsController acctCtrlr = new AccountsController();
 
 while (customer == null)
 {
@@ -26,6 +27,7 @@ while (ProgramRunning == true)
     switch (option)
     {
         case "1":
+            await acctCtrlr.GetBalance(customer.Id);
             break;
         case "2":
             break;
