@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -38,31 +39,38 @@ namespace BankingConsoleApi.Controllers
         {
             var amount = CheckAmount(GeneralController.ReadAndWrite("Amount to withdraw: "));
             var accountId = CheckId(GeneralController.ReadAndWrite("Account to withdraw from: "), accounts);
-
             if (amount == null || accountId == null)
             {
                 Console.WriteLine("Invalid Input");
                 return;
             }
-
+            Transaction? newTransaction = await CompleteTransaction(accountId, amount, "W", accounts);
+            if (newTransaction == null)
+            {
+                Console.WriteLine("Cannot Overdraw Account!");
+                return;
+            }
+            Console.WriteLine($"Withdrew {amount} from account {accountId}");
+        }
+        private static async Task<Transaction> CompleteTransaction(int? accountId, decimal? amount, string type, IEnumerable<Account> accounts)
+        {
             var newTransaction = new Transaction()
             {
                 Id = 0,
                 AccountId = (int)accountId,
                 PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
-                TransactionType = "W"
+                TransactionType = type
             };
-            if (amount > newTransaction.PreviousBalance)
+            if (type == "W")
             {
-                Console.WriteLine("Invalid Input");
-                return;
+                if (amount > newTransaction.PreviousBalance)
+                {
+                    return null;
+                }
             }
             await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, (decimal)amount);
-            Console.WriteLine($"Withdrew {amount} from account {accountId}");
-            Console.WriteLine($"New Balance is {newTransaction.PreviousBalance - amount:c}");
-
+            return newTransaction;
         }
-
         public static async Task Transfer(IEnumerable<Account> accounts)
         {
             decimal amount;
