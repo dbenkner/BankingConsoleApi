@@ -8,6 +8,8 @@ CustomersController _cusCtrlr = new CustomersController();
 Customer? customer = null;
 GeneralController generalCtrlr = new GeneralController();
 AccountsController acctCtrlr = new AccountsController();
+TransactionsController transCtrlr = new TransactionsController();
+IEnumerable<Account> accounts;
 
 while (customer == null)
 {
@@ -27,9 +29,11 @@ while (ProgramRunning == true)
     switch (option)
     {
         case "1":
-            var accounts = await acctCtrlr.GetBalance(customer.Id);
+            accounts = await acctCtrlr.GetBalance(customer.Id);
             break;
         case "2":
+            accounts = await acctCtrlr.GetBalance(customer.Id);
+            await transCtrlr.MakeDeposit(generalCtrlr._http, generalCtrlr.joptions, accounts);
             break;
         case "3":
             break;
