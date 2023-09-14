@@ -9,10 +9,32 @@ namespace BankingConsoleApi.Controllers
 {
     public class TransactionsController : GeneralController
     {
-        public async Task MakeDeposit(HttpClient _http, JsonSerializerOptions joptions, IEnumerable<Account> accounts) 
+        public async Task MakeDeposit(IEnumerable<Account> accounts) 
         {
-            var amount = ReadAndWrite("Amount to deposit: ");
-            var accountId = ReadAndWrite("Account to deposit to: ");
+            decimal amount;
+            int accountId;
+            var amountStr = ReadAndWrite("Amount to deposit: ");
+            var accountIdStr = ReadAndWrite("Account to deposit to: ");
+            bool accountExists = false;
+            bool successAmount = decimal.TryParse(amountStr, out amount);
+            bool successAccountId = int.TryParse(accountIdStr, out accountId);
+            if (successAmount == false || successAccountId == false) 
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
+            foreach (var account in accounts)
+            {
+                if (accountId == account.Id)
+                {
+                    accountExists = true;
+                }
+            }
+            if (accountExists == false)
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
         }
     }
 }
