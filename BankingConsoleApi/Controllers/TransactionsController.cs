@@ -175,7 +175,6 @@ namespace BankingConsoleApi.Controllers
             }
             if (accountExists == false)
             {
-                Console.WriteLine("Invalid Input");
                 return null;
             }
 

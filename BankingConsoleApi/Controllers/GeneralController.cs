@@ -21,7 +21,7 @@ namespace BankingConsoleApi.Controllers
         }
         public static string OptionsMenu()
         {
-            Console.WriteLine("--------------------------------------------------------");
+            Console.WriteLine("------------------------------------------------------------------------------------------------------------------------------");
             Console.WriteLine("1. Get your Balance");
             Console.WriteLine("2. Make Deposit");
             Console.WriteLine("3. Make Withdrawal");
