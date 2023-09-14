@@ -7,7 +7,13 @@ namespace BankingConsoleApi.Controllers
 	{
 		public async Task<IEnumerable<Account>> GetBalance(int customerId)
 		{
-			return await GetAccounts(_http, joptions, customerId);
+			var accounts = await GetAccounts(_http, joptions, customerId);
+			Console.WriteLine("Account ID | Account Desc | Account Type | Account Balance");
+			foreach(var account in accounts)
+			{
+				Console.WriteLine($"{account.Id,10} | {account.Description,12} | {account.Type,12} | {account.Balance,15:c}");
+			}
+			return accounts;
 		}
 
         private async Task<IEnumerable<Account>> GetAccounts(HttpClient _http, JsonSerializerOptions joptions, int customerId)
