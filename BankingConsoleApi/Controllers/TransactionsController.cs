@@ -156,7 +156,7 @@ namespace BankingConsoleApi.Controllers
             return amount;
         }
 
-        private static int? CheckId(string value, IEnumerable<Account> accounts)
+        public static int? CheckId(string value, IEnumerable<Account> accounts)
         {
             int id;
             bool successId = int.TryParse(value, out id);

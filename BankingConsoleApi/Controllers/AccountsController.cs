@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 
 namespace BankingConsoleApi.Controllers
@@ -38,8 +39,13 @@ namespace BankingConsoleApi.Controllers
 					return;
 			}
 		}
+        public static async Task CloseAccount(int customerId)
+		{
+			var accountId = TransactionsController.CheckId(GeneralController.ReadAndWrite("Enter Id of account to close"));
+			
+		}
 
-		private static async Task<IEnumerable<Account>> GetAccounts(HttpClient _http, JsonSerializerOptions joptions, int customerId)
+        private static async Task<IEnumerable<Account>> GetAccounts(HttpClient _http, JsonSerializerOptions joptions, int customerId)
 		{
 			HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{GeneralController.BaseURL}/api/Accounts/Customer/{customerId}");
 			HttpResponseMessage res = await _http.SendAsync(req);
@@ -66,7 +72,7 @@ namespace BankingConsoleApi.Controllers
             req.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             HttpResponseMessage response = await _http.SendAsync(req);
             return;
-        }
+        } 
 	}
 }
 
