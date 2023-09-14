@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace BankingConsoleApi.Controllers
 {
-    public class TransactionsController : GeneralController
+    public static class TransactionsController
     {
 
-        public async Task MakeDeposit(IEnumerable<Account> accounts) 
+        public static async Task MakeDeposit(IEnumerable<Account> accounts) 
         {
             decimal amount;
             int accountId;
-            var amountStr = ReadAndWrite("Amount to deposit: ");
-            var accountIdStr = ReadAndWrite("Account to deposit to: ");
+            var amountStr = GeneralController.ReadAndWrite("Amount to deposit: ");
+            var accountIdStr = GeneralController.ReadAndWrite("Account to deposit to: ");
             bool successAmount = decimal.TryParse(amountStr, out amount);
             bool successAccountId = int.TryParse(accountIdStr, out accountId);
             if (successAmount == false || successAccountId == false) 
@@ -43,18 +43,18 @@ namespace BankingConsoleApi.Controllers
                 PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
                 TransactionType = "D"
             };
-            await MakeTransaction(_http, joptions, newTransaction, amount);
+            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, amount);
             Console.WriteLine($"Deposited {amount} in account {accountId}");
             Console.WriteLine($"New Balance is {newTransaction.PreviousBalance + amount:c}");
 
         }
 
-        public async Task MakeWithdraw(IEnumerable<Account> accounts)
+        public static async Task MakeWithdraw(IEnumerable<Account> accounts)
         {
             decimal amount;
             int accountId;
-            var amountStr = ReadAndWrite("Amount to withdraw: ");
-            var accountIdStr = ReadAndWrite("Account to withdraw from: ");
+            var amountStr = GeneralController.ReadAndWrite("Amount to withdraw: ");
+            var accountIdStr = GeneralController.ReadAndWrite("Account to withdraw from: ");
             bool successAmount = decimal.TryParse(amountStr, out amount);
             bool successAccountId = int.TryParse(accountIdStr, out accountId);
             if (successAmount == false || successAccountId == false)
@@ -87,20 +87,20 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            await MakeTransaction(_http, joptions, newTransaction, amount);
+            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, amount);
             Console.WriteLine($"Withdrew {amount} from account {accountId}");
             Console.WriteLine($"New Balance is {newTransaction.PreviousBalance - amount:c}");
 
         }
 
-        public async Task Transfer(IEnumerable<Account> accounts)
+        public static async Task Transfer(IEnumerable<Account> accounts)
         {
             decimal amount;
             int fromAccountId;
             int toAccountId;
-            var amountStr = ReadAndWrite("Amount to transfer: ");
-            var fromAccountIdStr = ReadAndWrite("Account to transfer from: ");
-            var toAccountIdStr = ReadAndWrite("Account to transfer to: ");
+            var amountStr = GeneralController.ReadAndWrite("Amount to transfer: ");
+            var fromAccountIdStr = GeneralController.ReadAndWrite("Account to transfer from: ");
+            var toAccountIdStr = GeneralController.ReadAndWrite("Account to transfer to: ");
             bool successAmount = decimal.TryParse(amountStr, out amount);
             bool successFromAccountId = int.TryParse(fromAccountIdStr, out fromAccountId);
             bool successToAccountId = int.TryParse(toAccountIdStr, out toAccountId);
@@ -146,15 +146,15 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            await MakeTransaction(_http, joptions, fromTransaction, amount);
-            await MakeTransaction(_http, joptions, toTransaction, amount);
+            await MakeTransaction(GeneralController._http, GeneralController.joptions, fromTransaction, amount);
+            await MakeTransaction(GeneralController._http, GeneralController.joptions, toTransaction, amount);
             Console.WriteLine("Transaction Completed!");
         }
 
-        public async Task GetAllTrans(IEnumerable<Account> accounts)
+        public static async Task GetAllTrans(IEnumerable<Account> accounts)
         {
             int accountId;
-            var accountIdStr = ReadAndWrite("Account number: ");
+            var accountIdStr = GeneralController.ReadAndWrite("Account number: ");
             bool successAccountId = int.TryParse(accountIdStr, out accountId);
             if (successAccountId == false)
             {
@@ -174,7 +174,7 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            var transactions = await GetTransactions(_http, joptions, accountId);
+            var transactions = await GetTransactions(GeneralController._http, GeneralController.joptions, accountId);
             Console.WriteLine("Transaction ID | Type | Previous Balance | New Balance | Transaction Total | Transaction Date");
             foreach (var transaction in transactions)
             {
@@ -191,18 +191,18 @@ namespace BankingConsoleApi.Controllers
             }
         }
 
-        private async Task<IEnumerable<Transaction>> GetTransactions(HttpClient _http, JsonSerializerOptions joptions, int accountId)
+        private static async Task<IEnumerable<Transaction>> GetTransactions(HttpClient _http, JsonSerializerOptions joptions, int accountId)
         {
-            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{BaseURL}/api/Transactions/Account/{accountId}");
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{GeneralController.BaseURL}/api/Transactions/Account/{accountId}");
             HttpResponseMessage res = await _http.SendAsync(req);
             var json = await res.Content.ReadAsStringAsync();
             var transactions = (IEnumerable<Transaction>?)JsonSerializer.Deserialize(json, typeof(IEnumerable<Transaction>), joptions);
             return transactions;
         }
 
-        private async Task MakeTransaction(HttpClient _http, JsonSerializerOptions joptions, Transaction newTrans, decimal amount)
+        private static async Task MakeTransaction(HttpClient _http, JsonSerializerOptions joptions, Transaction newTrans, decimal amount)
         {
-            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, $"{BaseURL}/api/transactions/{amount}");
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, $"{GeneralController.BaseURL}/api/transactions/{amount}");
             var json = JsonSerializer.Serialize<Transaction>(newTrans, joptions);
             req.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             HttpResponseMessage response = await _http.SendAsync(req);

@@ -3,23 +3,23 @@ using System.Text.Json;
 
 namespace BankingConsoleApi.Controllers
 {
-	public class GeneralController
+	public static class GeneralController
 	{
-        public const string BaseURL = "http://localhost:5555";
-        public HttpClient _http = new HttpClient();
-        public JsonSerializerOptions joptions = new JsonSerializerOptions()
+        public static string BaseURL = "http://localhost:5555";
+        public static HttpClient _http = new HttpClient();
+        public static JsonSerializerOptions joptions = new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
 
-        public string ReadAndWrite(string message)
+        public static string ReadAndWrite(string message)
         {
             Console.Write(message);
             return Console.ReadLine();
         }
-        public string OptionsMenu()
+        public static string OptionsMenu()
         {
             Console.WriteLine("Please select an option.");
             Console.WriteLine("1. Get your Balance");
