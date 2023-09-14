@@ -33,7 +33,7 @@ while (ProgramRunning == true)
             break;
         case "2":
             accounts = await acctCtrlr.GetBalance(customer.Id);
-            await transCtrlr.MakeDeposit(generalCtrlr._http, generalCtrlr.joptions, accounts);
+            await transCtrlr.MakeDeposit(accounts);
             break;
         case "3":
             break;
