@@ -36,6 +36,8 @@ while (ProgramRunning == true)
             await transCtrlr.MakeDeposit(accounts);
             break;
         case "3":
+            accounts = await acctCtrlr.GetBalance(customer.Id);
+            await transCtrlr.MakeWithdraw(accounts);
             break;
         case "4":
             break;
