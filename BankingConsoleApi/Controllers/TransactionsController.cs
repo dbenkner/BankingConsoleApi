@@ -10,40 +10,25 @@ namespace BankingConsoleApi.Controllers
     public static class TransactionsController
     {
 
-        public static async Task MakeDeposit(IEnumerable<Account> accounts) 
+        public static async Task MakeDeposit(IEnumerable<Account> accounts)
         {
-            decimal amount;
-            int accountId;
-            var amountStr = GeneralController.ReadAndWrite("Amount to deposit: ");
-            var accountIdStr = GeneralController.ReadAndWrite("Account to deposit to: ");
-            bool successAmount = decimal.TryParse(amountStr, out amount);
-            bool successAccountId = int.TryParse(accountIdStr, out accountId);
-            if (successAmount == false || successAccountId == false) 
+            var amount = CheckAmount(GeneralController.ReadAndWrite("Amount to deposit: "));
+            var accountId = CheckId(GeneralController.ReadAndWrite("Account to deposit to: "), accounts);
+
+            if (amount == null || accountId == null)
             {
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            bool accountExists = false;
-            foreach (var account in accounts)
-            {
-                if (accountId == account.Id)
-                {
-                    accountExists = true;
-                }
-            }
-            if (accountExists == false)
-            {
-                Console.WriteLine("Invalid Input");
-                return;
-            }
+
             var newTransaction = new Transaction()
             {
                 Id = 0,
-                AccountId = accountId,
+                AccountId = (int)accountId,
                 PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
                 TransactionType = "D"
             };
-            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, amount);
+            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, (decimal)amount);
             Console.WriteLine($"Deposited {amount} in account {accountId}");
             Console.WriteLine($"New Balance is {newTransaction.PreviousBalance + amount:c}");
 
@@ -51,34 +36,19 @@ namespace BankingConsoleApi.Controllers
 
         public static async Task MakeWithdraw(IEnumerable<Account> accounts)
         {
-            decimal amount;
-            int accountId;
-            var amountStr = GeneralController.ReadAndWrite("Amount to withdraw: ");
-            var accountIdStr = GeneralController.ReadAndWrite("Account to withdraw from: ");
-            bool successAmount = decimal.TryParse(amountStr, out amount);
-            bool successAccountId = int.TryParse(accountIdStr, out accountId);
-            if (successAmount == false || successAccountId == false)
+            var amount = CheckAmount(GeneralController.ReadAndWrite("Amount to withdraw: "));
+            var accountId = CheckId(GeneralController.ReadAndWrite("Account to withdraw from: "), accounts);
+
+            if (amount == null || accountId == null)
             {
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            bool accountExists = false;
-            foreach (var account in accounts)
-            {
-                if (accountId == account.Id)
-                {
-                    accountExists = true;
-                }
-            }
-            if (accountExists == false)
-            {
-                Console.WriteLine("Invalid Input");
-                return;
-            }
+
             var newTransaction = new Transaction()
             {
                 Id = 0,
-                AccountId = accountId,
+                AccountId = (int)accountId,
                 PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
                 TransactionType = "W"
             };
@@ -87,7 +57,7 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, amount);
+            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, (decimal)amount);
             Console.WriteLine($"Withdrew {amount} from account {accountId}");
             Console.WriteLine($"New Balance is {newTransaction.PreviousBalance - amount:c}");
 
@@ -179,7 +149,7 @@ namespace BankingConsoleApi.Controllers
             foreach (var transaction in transactions)
             {
                 decimal total;
-                if ( transaction.TransactionType == "W")
+                if (transaction.TransactionType == "W")
                 {
                     total = transaction.PreviousBalance - transaction.NewBalance;
                 }
@@ -206,6 +176,43 @@ namespace BankingConsoleApi.Controllers
             var json = JsonSerializer.Serialize<Transaction>(newTrans, joptions);
             req.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             HttpResponseMessage response = await _http.SendAsync(req);
+        }
+
+        private static decimal? CheckAmount(string value)
+        {
+            decimal amount;
+            bool successAmount = decimal.TryParse(value, out amount);
+            if (successAmount == false)
+            {
+                return null;
+            }
+            return amount;
+        }
+
+        private static int? CheckId(string value, IEnumerable<Account> accounts)
+        {
+            int id;
+            bool successId = int.TryParse(value, out id);
+            if (successId == false)
+            {
+                return null;
+            }
+
+            bool accountExists = false;
+            foreach (var account in accounts)
+            {
+                if (id == account.Id)
+                {
+                    accountExists = true;
+                }
+            }
+            if (accountExists == false)
+            {
+                Console.WriteLine("Invalid Input");
+                return null;
+            }
+
+            return id;
         }
     }
 }
