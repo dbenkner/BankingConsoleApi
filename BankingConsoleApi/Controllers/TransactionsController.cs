@@ -9,6 +9,7 @@ namespace BankingConsoleApi.Controllers
 {
     public class TransactionsController : GeneralController
     {
+
         public async Task MakeDeposit(IEnumerable<Account> accounts) 
         {
             decimal amount;
@@ -42,6 +43,18 @@ namespace BankingConsoleApi.Controllers
                 PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
                 TransactionType = "D"
             };
+            await MakeTransaction(_http, joptions, newTransaction, amount);
+            Console.WriteLine($"Deposited {amount} in account {accountId}");
+            Console.WriteLine($"New Balance is {newTransaction.PreviousBalance + amount:c}");
+
+        }
+
+        async Task MakeTransaction(HttpClient _http, JsonSerializerOptions joptions, Transaction newTrans, decimal amount)
+        {
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, $"{BaseURL}/api/transactions/{amount}");
+            var json = JsonSerializer.Serialize<Transaction>(newTrans, joptions);
+            req.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await _http.SendAsync(req);
         }
     }
 }
