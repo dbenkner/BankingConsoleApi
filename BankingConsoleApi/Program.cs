@@ -27,7 +27,7 @@ while (ProgramRunning == true)
     switch (option)
     {
         case "1":
-            await acctCtrlr.GetBalance(customer.Id);
+            var accounts = await acctCtrlr.GetBalance(customer.Id);
             break;
         case "2":
             break;
@@ -45,6 +45,7 @@ while (ProgramRunning == true)
             break;
     }
 }
+
 
 
 
