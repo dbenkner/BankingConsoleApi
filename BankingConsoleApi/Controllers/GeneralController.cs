@@ -27,7 +27,8 @@ namespace BankingConsoleApi.Controllers
             Console.WriteLine("3. Make Withdrawal");
             Console.WriteLine("4. Transfer");
             Console.WriteLine("5. Get Transactions");
-            Console.WriteLine("6. Exit");
+            Console.WriteLine("6. Open a New Account");
+            Console.WriteLine("7. Exit");
             return ReadAndWrite("Please select a number: ");
         }
     }

@@ -44,6 +44,9 @@ while (ProgramRunning == true)
             await TransactionsController.GetAllTrans(accounts);
             break;
         case "6":
+            await AccountsController.OpenAccount(customer.Id);
+            break;
+        case "7":
             ProgramRunning = false;
             break;
         default:
