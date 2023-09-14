@@ -10,15 +10,6 @@ namespace BankingConsoleApi.Controllers
 
     public class CustomersController : GeneralController
     {
-        const string BaseURL = "http://localhost:5555";
-        HttpClient _http = new HttpClient();
-        JsonSerializerOptions joptions = new JsonSerializerOptions()
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-
         public async Task<Customer?> LoginCustomer()
         {
             var CardCodeStr = ReadAndWrite("Please enter your Card Code: ");

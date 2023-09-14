@@ -1,8 +1,19 @@
 ﻿using System;
+using System.Text.Json;
+
 namespace BankingConsoleApi.Controllers
 {
 	public class GeneralController
 	{
+        public const string BaseURL = "http://localhost:5555";
+        public HttpClient _http = new HttpClient();
+        public JsonSerializerOptions joptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+
         public string ReadAndWrite(string message)
         {
             Console.Write(message);
