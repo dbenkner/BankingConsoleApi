@@ -93,7 +93,7 @@ namespace BankingConsoleApi.Controllers
 
         }
 
-        public async Task Transfer()
+        public async Task Transfer(IEnumerable<Account> accounts)
         {
             decimal amount;
             int fromAccountId;
@@ -104,6 +104,46 @@ namespace BankingConsoleApi.Controllers
             bool successAmount = decimal.TryParse(amountStr, out amount);
             bool successFromAccountId = int.TryParse(fromAccountIdStr, out fromAccountId);
             bool successToAccountId = int.TryParse(toAccountIdStr, out toAccountId);
+            if (successAmount == false || successFromAccountId == false || successToAccountId == false)
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
+            bool fromAccountExists = false;
+            bool toAccountExists = false;
+            foreach (var account in accounts)
+            {
+                if (fromAccountId == account.Id)
+                {
+                    fromAccountExists = true;
+                }
+                if (toAccountId == account.Id)
+                {
+                    toAccountExists = true;
+                }
+            }
+            if (fromAccountExists == false || toAccountExists == false)
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
+            var fromTransaction = new Transaction()
+            {
+                Id = 0,
+                AccountId = fromAccountId,
+                PreviousBalance = (decimal)accounts.Where(x => x.Id == fromAccountId).SingleOrDefault().Balance,
+                TransactionType = "W"
+            };
+            var toTransaction = new Transaction()
+            {
+                Id = 0,
+                AccountId = toAccountId,
+                PreviousBalance = (decimal)accounts.Where(x => x.Id == toAccountId).SingleOrDefault().Balance,
+                TransactionType = "D"
+            };
+            await MakeTransaction(_http, joptions, fromTransaction, amount);
+            await MakeTransaction(_http, joptions, toTransaction, amount);
+            Console.Write("Transaction Completed!");
         }
 
         private async Task MakeTransaction(HttpClient _http, JsonSerializerOptions joptions, Transaction newTrans, decimal amount)
