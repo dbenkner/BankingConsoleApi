@@ -8,12 +8,12 @@ using System.Text.Json;
 namespace BankingConsoleApi.Controllers
 {
 
-    public class CustomersController : GeneralController
+    public static class CustomersController
     {
-        public async Task<Customer?> LoginCustomer()
+        public static async Task<Customer?> LoginCustomer()
         {
-            var CardCodeStr = ReadAndWrite("Please enter your Card Code: ");
-            var PinCodeStr = ReadAndWrite("Please enter you Pin Code: ");
+            var CardCodeStr = GeneralController.ReadAndWrite("Please enter your Card Code: ");
+            var PinCodeStr = GeneralController.ReadAndWrite("Please enter you Pin Code: ");
             int CardCodeInt;
             int PinCodeInt;
             bool successCardCode = int.TryParse(CardCodeStr, out CardCodeInt);
@@ -22,7 +22,7 @@ namespace BankingConsoleApi.Controllers
             {
                 return null;
             }
-            var customer = await LogIn(_http, joptions, CardCodeInt, PinCodeInt);
+            var customer = await LogIn(GeneralController._http, GeneralController.joptions, CardCodeInt, PinCodeInt);
             if (customer.Id == 0)
             {
                 return null;
@@ -30,9 +30,9 @@ namespace BankingConsoleApi.Controllers
 
             return customer;
         }
-        private async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
+        private static async Task<Customer> LogIn(HttpClient _http, JsonSerializerOptions joptions, int Cardcode, int Pincode)
         {
-            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{BaseURL}/api/customers/{Cardcode}/{Pincode}");
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{GeneralController.BaseURL}/api/customers/{Cardcode}/{Pincode}");
             HttpResponseMessage response = await _http.SendAsync(req);
             var json = await response.Content.ReadAsStringAsync();
             var customer = (Customer?)JsonSerializer.Deserialize(json, typeof(Customer), joptions);

@@ -3,11 +3,11 @@ using System.Text.Json;
 
 namespace BankingConsoleApi.Controllers
 {
-	public class AccountsController : GeneralController
+	public static class AccountsController
 	{
-		public async Task<IEnumerable<Account>> GetBalance(int customerId)
+		public static async Task<IEnumerable<Account>> GetBalance(int customerId)
 		{
-			var accounts = await GetAccounts(_http, joptions, customerId);
+			var accounts = await GetAccounts(GeneralController._http, GeneralController.joptions, customerId);
 			Console.WriteLine("Account ID | Account Desc | Account Type | Account Balance");
 			foreach(var account in accounts)
 			{
@@ -16,9 +16,9 @@ namespace BankingConsoleApi.Controllers
 			return accounts;
 		}
 
-        private async Task<IEnumerable<Account>> GetAccounts(HttpClient _http, JsonSerializerOptions joptions, int customerId)
+        private static async Task<IEnumerable<Account>> GetAccounts(HttpClient _http, JsonSerializerOptions joptions, int customerId)
 		{
-			HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{BaseURL}/api/Accounts/Customer/{customerId}");
+			HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{GeneralController.BaseURL}/api/Accounts/Customer/{customerId}");
 			HttpResponseMessage res = await _http.SendAsync(req);
 			var json = await res.Content.ReadAsStringAsync();
 			var accounts = (IEnumerable<Account>?)JsonSerializer.Deserialize(json, typeof(IEnumerable<Account>), joptions);

@@ -4,16 +4,12 @@ using BankingConsoleApi.Controllers;
 
 string userInput = string.Empty;
 bool ProgramRunning = true;
-CustomersController _cusCtrlr = new CustomersController();
 Customer? customer = null;
-GeneralController generalCtrlr = new GeneralController();
-AccountsController acctCtrlr = new AccountsController();
-TransactionsController transCtrlr = new TransactionsController();
 IEnumerable<Account> accounts;
 
 while (customer == null)
 {
-        customer = await _cusCtrlr.LoginCustomer();
+        customer = await CustomersController.LoginCustomer();
         if (customer == null)
         {
             Console.WriteLine("Login failed. Please try again.");
@@ -25,27 +21,27 @@ Console.WriteLine($"Welcome! {customer.Name}!");
 
 while (ProgramRunning == true)
 {
-    var option = generalCtrlr.OptionsMenu();
+    var option = GeneralController.OptionsMenu();
     switch (option)
     {
         case "1":
-            accounts = await acctCtrlr.GetBalance(customer.Id);
+            accounts = await AccountsController.GetBalance(customer.Id);
             break;
         case "2":
-            accounts = await acctCtrlr.GetBalance(customer.Id);
-            await transCtrlr.MakeDeposit(accounts);
+            accounts = await AccountsController.GetBalance(customer.Id);
+            await TransactionsController.MakeDeposit(accounts);
             break;
         case "3":
-            accounts = await acctCtrlr.GetBalance(customer.Id);
-            await transCtrlr.MakeWithdraw(accounts);
+            accounts = await AccountsController.GetBalance(customer.Id);
+            await TransactionsController.MakeWithdraw(accounts);
             break;
         case "4":
-            accounts = await acctCtrlr.GetBalance(customer.Id);
-            await transCtrlr.Transfer(accounts);
+            accounts = await AccountsController.GetBalance(customer.Id);
+            await TransactionsController.Transfer(accounts);
             break;
         case "5":
-            accounts = await acctCtrlr.GetBalance(customer.Id);
-            await transCtrlr.GetAllTrans(accounts);
+            accounts = await AccountsController.GetBalance(customer.Id);
+            await TransactionsController.GetAllTrans(accounts);
             break;
         case "6":
             ProgramRunning = false;
