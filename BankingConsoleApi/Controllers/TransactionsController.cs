@@ -21,17 +21,9 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Invalid Input");
                 return;
             }
-
-            var newTransaction = new Transaction()
-            {
-                Id = 0,
-                AccountId = (int)accountId,
-                PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
-                TransactionType = "D"
-            };
-            await MakeTransaction(GeneralController._http, GeneralController.joptions, newTransaction, (decimal)amount);
-            Console.WriteLine($"Deposited {amount} in account {accountId}");
-            Console.WriteLine($"New Balance is {newTransaction.PreviousBalance + amount:c}");
+         
+            Transaction? newTransaction = await CompleteTransaction(accountId, amount, "D", accounts);
+            Console.WriteLine($"Deposited {amount:c} in account {accountId}");
 
         }
 
@@ -50,8 +42,9 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Cannot Overdraw Account!");
                 return;
             }
-            Console.WriteLine($"Withdrew {amount} from account {accountId}");
+            Console.WriteLine($"Withdrew {amount:c} from account {accountId}");
         }
+
         private static async Task<Transaction> CompleteTransaction(int? accountId, decimal? amount, string type, IEnumerable<Account> accounts)
         {
             var newTransaction = new Transaction()
@@ -73,60 +66,26 @@ namespace BankingConsoleApi.Controllers
         }
         public static async Task Transfer(IEnumerable<Account> accounts)
         {
-            decimal amount;
-            int fromAccountId;
-            int toAccountId;
-            var amountStr = GeneralController.ReadAndWrite("Amount to transfer: ");
-            var fromAccountIdStr = GeneralController.ReadAndWrite("Account to transfer from: ");
-            var toAccountIdStr = GeneralController.ReadAndWrite("Account to transfer to: ");
-            bool successAmount = decimal.TryParse(amountStr, out amount);
-            bool successFromAccountId = int.TryParse(fromAccountIdStr, out fromAccountId);
-            bool successToAccountId = int.TryParse(toAccountIdStr, out toAccountId);
-            if (successAmount == false || successFromAccountId == false || successToAccountId == false)
+            var amount = CheckAmount(GeneralController.ReadAndWrite("Amount to transfer: "));
+            var fromAccountId = CheckId(GeneralController.ReadAndWrite("Account to transfer from: "), accounts);
+            var toAccountId = CheckId(GeneralController.ReadAndWrite("Account to transfer to: "), accounts);
+
+            if (amount == null || fromAccountId == null || toAccountId == null)
             {
                 Console.WriteLine("Invalid Input");
                 return;
             }
-            bool fromAccountExists = false;
-            bool toAccountExists = false;
-            foreach (var account in accounts)
+
+            Transaction? fromTransaction = await CompleteTransaction(fromAccountId, amount, "W", accounts);
+            if (fromTransaction == null)
             {
-                if (fromAccountId == account.Id)
-                {
-                    fromAccountExists = true;
-                }
-                if (toAccountId == account.Id)
-                {
-                    toAccountExists = true;
-                }
-            }
-            if (fromAccountExists == false || toAccountExists == false)
-            {
-                Console.WriteLine("Invalid Input");
+                Console.WriteLine("Cannot Overdraw Account!");
                 return;
             }
-            var fromTransaction = new Transaction()
-            {
-                Id = 0,
-                AccountId = fromAccountId,
-                PreviousBalance = (decimal)accounts.Where(x => x.Id == fromAccountId).SingleOrDefault().Balance,
-                TransactionType = "W"
-            };
-            var toTransaction = new Transaction()
-            {
-                Id = 0,
-                AccountId = toAccountId,
-                PreviousBalance = (decimal)accounts.Where(x => x.Id == toAccountId).SingleOrDefault().Balance,
-                TransactionType = "D"
-            };
-            if (amount > fromTransaction.PreviousBalance)
-            {
-                Console.WriteLine("Invalid Input");
-                return;
-            }
-            await MakeTransaction(GeneralController._http, GeneralController.joptions, fromTransaction, amount);
-            await MakeTransaction(GeneralController._http, GeneralController.joptions, toTransaction, amount);
-            Console.WriteLine("Transaction Completed!");
+
+            Transaction? toTransaction = await CompleteTransaction(toAccountId, amount, "D", accounts);
+
+            Console.WriteLine("Transfer Completed!");
         }
 
         public static async Task GetAllTrans(IEnumerable<Account> accounts)
@@ -165,7 +124,7 @@ namespace BankingConsoleApi.Controllers
                 {
                     total = transaction.NewBalance - transaction.PreviousBalance;
                 }
-                Console.WriteLine($"{transaction.Id,10} | {transaction.TransactionType} | {transaction.PreviousBalance:c} | {transaction.NewBalance:c} | {total:c} | {transaction.CreatedDate:d}");
+                Console.WriteLine($"{transaction.Id,14} | {transaction.TransactionType,4} | {transaction.PreviousBalance,16:c} | {transaction.NewBalance,11:c} | {total,17:c} | {transaction.CreatedDate,16:d}");
             }
         }
 
