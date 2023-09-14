@@ -35,6 +35,13 @@ namespace BankingConsoleApi.Controllers
                 Console.WriteLine("Invalid Input");
                 return;
             }
+            var newTransaction = new Transaction()
+            {
+                Id = 0,
+                AccountId = accountId,
+                PreviousBalance = (decimal)accounts.Where(x => x.Id == accountId).SingleOrDefault().Balance,
+                TransactionType = "D"
+            };
         }
     }
 }
