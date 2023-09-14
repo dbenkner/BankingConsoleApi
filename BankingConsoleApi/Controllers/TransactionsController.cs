@@ -98,7 +98,7 @@ namespace BankingConsoleApi.Controllers
             decimal amount;
             int fromAccountId;
             int toAccountId;
-            var amountStr = ReadAndWrite("Amount to transfer ");
+            var amountStr = ReadAndWrite("Amount to transfer: ");
             var fromAccountIdStr = ReadAndWrite("Account to transfer from: ");
             var toAccountIdStr = ReadAndWrite("Account to transfer to: ");
             bool successAmount = decimal.TryParse(amountStr, out amount);
@@ -141,9 +141,61 @@ namespace BankingConsoleApi.Controllers
                 PreviousBalance = (decimal)accounts.Where(x => x.Id == toAccountId).SingleOrDefault().Balance,
                 TransactionType = "D"
             };
+            if (amount > fromTransaction.PreviousBalance)
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
             await MakeTransaction(_http, joptions, fromTransaction, amount);
             await MakeTransaction(_http, joptions, toTransaction, amount);
-            Console.Write("Transaction Completed!");
+            Console.WriteLine("Transaction Completed!");
+        }
+
+        public async Task GetAllTrans(IEnumerable<Account> accounts)
+        {
+            int accountId;
+            var accountIdStr = ReadAndWrite("Account number: ");
+            bool successAccountId = int.TryParse(accountIdStr, out accountId);
+            if (successAccountId == false)
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
+            bool accountExists = false;
+            foreach (var account in accounts)
+            {
+                if (accountId == account.Id)
+                {
+                    accountExists = true;
+                }
+            }
+            if (accountExists == false)
+            {
+                Console.WriteLine("Invalid Input");
+                return;
+            }
+            var transactions = await GetTransactions(_http, joptions, accountId);
+
+
+
+
+            /*
+            
+            Console.WriteLine("Account ID | Account Desc | Account Type | Account Balance");
+            foreach (var account in accounts)
+            {
+                Console.WriteLine($"{account.Id,10} | {account.Description,12} | {account.Type,12} | {account.Balance,15:c}");
+            }
+            */
+        }
+
+        private async Task<IEnumerable<Transaction>> GetTransactions(HttpClient _http, JsonSerializerOptions joptions, int accountId)
+        {
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, $"{BaseURL}/api/Transactions/Account/{accountId}");
+            HttpResponseMessage res = await _http.SendAsync(req);
+            var json = await res.Content.ReadAsStringAsync();
+            var transactions = (IEnumerable<Transaction>?)JsonSerializer.Deserialize(json, typeof(IEnumerable<Transaction>), joptions);
+            return transactions;
         }
 
         private async Task MakeTransaction(HttpClient _http, JsonSerializerOptions joptions, Transaction newTrans, decimal amount)

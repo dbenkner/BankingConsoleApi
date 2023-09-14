@@ -44,6 +44,8 @@ while (ProgramRunning == true)
             await transCtrlr.Transfer(accounts);
             break;
         case "5":
+            accounts = await acctCtrlr.GetBalance(customer.Id);
+            await transCtrlr.GetAllTrans(accounts);
             break;
         case "6":
             ProgramRunning = false;
