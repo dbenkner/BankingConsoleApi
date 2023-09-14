@@ -175,18 +175,20 @@ namespace BankingConsoleApi.Controllers
                 return;
             }
             var transactions = await GetTransactions(_http, joptions, accountId);
-
-
-
-
-            /*
-            
-            Console.WriteLine("Account ID | Account Desc | Account Type | Account Balance");
-            foreach (var account in accounts)
+            Console.WriteLine("Transaction ID | Type | Previous Balance | New Balance | Transaction Total | Transaction Date");
+            foreach (var transaction in transactions)
             {
-                Console.WriteLine($"{account.Id,10} | {account.Description,12} | {account.Type,12} | {account.Balance,15:c}");
+                decimal total;
+                if ( transaction.TransactionType == "W")
+                {
+                    total = transaction.PreviousBalance - transaction.NewBalance;
+                }
+                else
+                {
+                    total = transaction.NewBalance - transaction.PreviousBalance;
+                }
+                Console.WriteLine($"{transaction.Id,10} | {transaction.TransactionType} | {transaction.PreviousBalance:c} | {transaction.NewBalance:c} | {total:c} | {transaction.CreatedDate:d}");
             }
-            */
         }
 
         private async Task<IEnumerable<Transaction>> GetTransactions(HttpClient _http, JsonSerializerOptions joptions, int accountId)
